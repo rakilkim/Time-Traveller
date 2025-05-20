@@ -1,2 +1,2 @@
-# team34
-Repository for team34
+# team34(TimeTraveller)
+## By Marc Luzuriaga, Pranav Kesani, Rakil Kim
