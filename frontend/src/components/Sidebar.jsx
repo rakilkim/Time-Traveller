@@ -2,15 +2,13 @@ import { useState } from "react";
 
 export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
   const [query, setQuery] = useState("");
-  console.log(isOpen);
-
 
   return (
     <aside className={
-        `relative w-64 max-w-[80vw] bg-gray-800 text-gray-100 p-4 overflow-y-auto transition-transform duration-300 transform ${isOpen ? '-translate-x-11/12' : ''} `
+        `absolute w-64 max-w-[80vw] bg-gray-200 text-gray-700 p-4 overflow-y-auto transition-transform duration-300 transform ${!isOpen ? '-translate-x-11/12' : ''} opacity-90`
       } aria-hidden={!isOpen}>
         
-      <h2>Portfolio</h2>
+      <h2 className='text-xl'>Your Portfolio</h2>
 
       {/* search box */}
       <form
@@ -30,7 +28,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
             onChange={(e) => setQuery(e.target.value)}
             autoComplete="off"
             required
-            className='w-full px-2 py-1 rounded bg-gray-700 placeholder-gray-400'
+            className='w-fit px-2 py-1 rounded bg-gray-400 placeholder-gray-500'
           />
         </label>
       </form>
@@ -41,7 +39,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
             <button 
             onClick={() => onRemove(tkr)} 
             aria-label={`Remove ${tkr}`}
-            className='mr-2'
+            className='mr-2 px-1 py-0 cursor-pointer rounded-4xl hover:bg-gray-300'
             >
               ✕
             </button>
