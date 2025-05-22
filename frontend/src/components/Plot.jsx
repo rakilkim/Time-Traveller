@@ -10,7 +10,7 @@ function useElementSize(initialHeight = 200) {
     useEffect(() => {
         if (!ref.current) return;
 
-        const obs = new ResizeObserver(([entry]) => {
+        const obs = new ResizeObserver(([entry]) => {  // observes changes made to the plot
             const { width } = entry.contentRect;
             setSize((s) => ({width: Math.round(width), height: s.height }));
         });
@@ -75,6 +75,7 @@ export default function Plot({ symbols }) {
     );
 
     return (
+        // created ref object for the plot to track resizes
         <div ref={wrapRef} className='w-full'>
             {symbols.length && <UplotReact
                 data={data}

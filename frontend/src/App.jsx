@@ -31,7 +31,7 @@ export default function App() {
               isOpen={sideOpen}
             />
         </div>
-        <main className='h-full z-10 lg:ml-56'>
+        <main className='h-full z-10 ml-5 lg:ml-56'>
           <Plot symbols={portfolio} />
         </main>
       </div>
