@@ -11,7 +11,7 @@ import json
 
 load_dotenv()
 
-def prophet_model(ticker, n_steps=1):
+async def prophet_model(ticker, n_steps=1):
 
     """
     :type ticker: string
@@ -81,11 +81,12 @@ def prophet_model(ticker, n_steps=1):
             forecast = model.predict(future)
 
             #=========== STORE INFORMATION IN DICTIONARY ===========#
+            output["status"] = "OK"
             output[f"{frequency}_mean"] = forecast["yhat"].tolist()[-1*n_steps:]
             output[f"{frequency}_lowerbound"] = forecast["yhat_lower"].tolist()[-1*n_steps:]
             output[f"{frequency}_upperbound"] = forecast["yhat_upper"].tolist()[-1*n_steps:]
             output[f"{frequency}_time"] = forecast["ds"].tolist()[-1*n_steps:]
-
+            output[f"{frequency}_time"] = [ts.isoformat() for ts in output[f"{frequency}_time"]]
         return output
     
     except Exception as e:

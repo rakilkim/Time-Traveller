@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 
-def price_open(ticker, frequency, start_date):
+async def price_open(ticker, frequency, start_date):
 
     """
     :type ticker: string
@@ -31,10 +31,15 @@ def price_open(ticker, frequency, start_date):
         for a in client.list_aggs(ticker=ticker, multiplier=1, timespan=frequency, from_ = start_date, to= end):
             price_open.append(a.open)
             time_open.append(a.timestamp)
+        
+        
+        time_open = pd.to_datetime(time_open, unit="ms").tolist()
+        time_open = [ts.isoformat() for ts in time_open]
 
         return {
+            "status": "OK",
             "price_open": price_open,
-            "time_open": pd.to_datetime(time_open, unit="ms").tolist()
+            "time_open": time_open
         }
     
     except Exception as e:

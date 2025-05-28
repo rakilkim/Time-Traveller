@@ -9,15 +9,15 @@ import json
 
 load_dotenv()
 
-def combination_model(ticker, steps):
+async def combination_model(ticker, steps):
     try:
         client = RESTClient(api_key=os.getenv("API_KEY"))
         client.get_ticker_details(ticker)
 
-        arima_ols_predictions = arima_ols(ticker, steps)
-        prophet_predictions = prophet_model(ticker, steps)
-        mapa_predictions = mapa_model(ticker, steps)
-        ets_predictions = ets_model(ticker, steps)
+        arima_ols_predictions = await arima_ols(ticker, steps)
+        prophet_predictions = await prophet_model(ticker, steps)
+        mapa_predictions = await mapa_model(ticker, steps)
+        ets_predictions = await ets_model(ticker, steps)
 
         output = {
             "hour_time": ets_predictions["hour_time"],
@@ -52,7 +52,7 @@ def combination_model(ticker, steps):
                 combined_field.append(average)
 
             output[field] = combined_field
-
+        output["status"] = "OK"
         return output
     
     except Exception as e:

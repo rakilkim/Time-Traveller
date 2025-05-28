@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 
-def price_close(ticker, frequency, start_date):
+async def price_close(ticker, frequency, start_date):
 
     """
     :type ticker: string
@@ -32,11 +32,14 @@ def price_close(ticker, frequency, start_date):
             price_close.append(a.close)
             time_close.append(a.timestamp)
 
+        time_close = pd.to_datetime(time_close, unit="ms").tolist()
+        time_close = [ts.isoformat() for ts in time_close]
+
         return {
+            "status": "OK",
             "price_close": price_close,
-            "time_close": pd.to_datetime(time_close, unit="ms").tolist()
+            "time_close": time_close
         }
     
     except Exception as e:
-        
         return json.loads(e.args[0])

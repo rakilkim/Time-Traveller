@@ -4,6 +4,7 @@ from datetime import datetime
 
 class Forecast(BaseModel):
 
+    status: str
     hour_mean: List[float]
     hour_lowerbound: List[float]
     hour_upperbound: List[float]

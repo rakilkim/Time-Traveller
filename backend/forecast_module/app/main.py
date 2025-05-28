@@ -1,10 +1,14 @@
 # main.py
 from fastapi import FastAPI
-from api import forecast, detail
+from api import forecast, detail, redis
 
 app = FastAPI()
+
 app.include_router(forecast.router, prefix="/forecast", tags=["Forecast"])
 app.include_router(detail.router, prefix="/detail", tags=["Detail"])
+
+#DO NOT UNCOMMENT: ONLY USED FOR TESTING
+# app.include_router(redis.router, prefix="/redis", tags=["Router"])
 
 if __name__ == "__main__":
     import uvicorn
