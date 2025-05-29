@@ -24,15 +24,17 @@ export default function App() {
           >
             ☰
           </button>
-            <Sidebar
-              portfolio={portfolio}
-              onAdd={addTicker}
-              onRemove={removeTicker}
-              isOpen={sideOpen}
-            />
+          <Sidebar
+            portfolio={portfolio}
+            onAdd={addTicker}
+            onRemove={removeTicker}
+            isOpen={sideOpen}
+          />
         </div>
         <main className='h-full z-10 ml-5 lg:ml-56'>
-          <Plot symbols={portfolio} />
+          {portfolio.map((ticker, i) => (
+            <Plot ticker={ticker} />
+          ))}
         </main>
       </div>
     </BrowserRouter>
