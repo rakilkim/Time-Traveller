@@ -49,7 +49,7 @@ def mapa(series: pd.Series, h: int, max_agg: int = 5):
     }
 
 
-def mapa_model(ticker, n_steps=1):
+async def mapa_model(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string
@@ -115,13 +115,15 @@ def mapa_model(ticker, n_steps=1):
 
 
             #=========== STORE INFORMATION IN DICTIONARY ===========#
+            output["status"] = "OK"
             output[f"{frequency}_mean"] = forecast_object["mean"].tolist()
             output[f"{frequency}_lowerbound"] = forecast_object["lower"].tolist()
             output[f"{frequency}_upperbound"] = forecast_object["upper"].tolist()
             output[f"{frequency}_time"] = pd.to_datetime(future_times, unit="ms").tolist()
-
+            output[f"{frequency}_time"] = [ts.isoformat() for ts in output[f"{frequency}_time"]]
+            
         return output
     
     except Exception as e:
         
-        return e
+        return json.loads(e.args[0])

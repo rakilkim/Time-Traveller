@@ -11,7 +11,7 @@ import json
 
 load_dotenv()
 
-def ets_model(ticker, n_steps=1):
+async def ets_model(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string
@@ -94,10 +94,12 @@ def ets_model(ticker, n_steps=1):
             upper = forecast+z*std
 
             #=========== STORE INFORMATION IN DICTIONARY ===========#
+            output["status"] = "OK"
             output[f"{frequency}_mean"] = forecast.tolist()
             output[f"{frequency}_lowerbound"] = lower.tolist()
             output[f"{frequency}_upperbound"] = upper.tolist()
             output[f"{frequency}_time"] = pd.to_datetime(future_times, unit='ms')
+            output[f"{frequency}_time"] = [ts.isoformat() for ts in output[f"{frequency}_time"]]
 
         return output
     

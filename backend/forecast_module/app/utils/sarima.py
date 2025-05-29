@@ -12,7 +12,7 @@ import json
 
 load_dotenv()
 
-def arima_ols(ticker, n_steps=1):
+async def arima_ols(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string
@@ -101,12 +101,14 @@ def arima_ols(ticker, n_steps=1):
             upper_bound = trend_forecast + seasonal_forecast + conf_int.iloc[:, 1]
 
             #=========== STEP 4 - STORE INFORMATION IN DICTIONARY ===========#
+            output["status"] = "OK"
             output[f"{frequency}_mean"] = full_forecast.tolist()
             output[f"{frequency}_lowerbound"] = lower_bound.tolist()
             output[f"{frequency}_upperbound"] = upper_bound.tolist()
             output[f"{frequency}_time"] = pd.to_datetime(future_times, unit='ms')
+            output[f"{frequency}_time"] = [ts.isoformat() for ts in output[f"{frequency}_time"]]
         return output
     
     except Exception as e:
-        
+
         return json.loads(e.args[0])

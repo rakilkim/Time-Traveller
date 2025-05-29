@@ -1,8 +1,7 @@
 # main.py
 from fastapi import FastAPI
-from api import forecast, detail
+from api import forecast, detail, redis
 from fastapi.middleware.cors import CORSMiddleware
-from api import forecast, detail
 
 app = FastAPI()
 
@@ -12,6 +11,7 @@ origins = [
 ]
 
 app = FastAPI()
+
 app.include_router(forecast.router, prefix="/forecast", tags=["Forecast"])
 app.include_router(detail.router, prefix="/detail", tags=["Detail"])
 app.add_middleware(
