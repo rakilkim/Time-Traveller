@@ -1,6 +1,9 @@
 from fastapi import APIRouter
+from datetime import datetime
 import redis.asyncio as redis
-import asyncio, json
+import json
+
+#TODO: Add functionality to support fetching data only needed.
 
 # Redis client
 r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
@@ -32,11 +35,11 @@ async def get_forecast(model_type: str, ticker: str, steps: int) -> dict | None:
         raise
     return None
 
-# Cache format for detail: detail:{type}:{frequency}:{start_date}:{ticker} => JSON string
+# Cache format for detail: detail:{type}:{frequency}:{ticker} => JSON string
 
-async def set_detail(type: str, frequency: str,  start_date: str, ticker: str, value: dict) -> None:
+async def set_detail(type: str, frequency: str, ticker: str, value: dict) -> None:
     """Store detail in cache as JSON string with 1-hour TTL."""
-    key = f"detail:{type}:{frequency}:{start_date}:{ticker}"
+    key = f"detail:{type}:{frequency}:{ticker}"
     print(f"Writing {key} to cache")
     try:
         json_value = json.dumps(value)
@@ -47,15 +50,21 @@ async def set_detail(type: str, frequency: str,  start_date: str, ticker: str, v
 
 
 
-async def get_detail(type: str, frequency: str, start_date: str, ticker: str) -> dict | None:
+async def get_detail(type: str, frequency: str, start_date: str, end_date: str, ticker: str) -> dict | None:
     """Retrieve detail from cache and return parsed JSON (or None)."""
-    key = f"detail:{type}:{frequency}:{start_date}:{ticker}"
+    key = f"detail:{type}:{frequency}:{ticker}"
     print(f"Attempting to fetch {key} from cache")
     try:
         value = await r.get(key)
+
         if value:
-            print(f"{key} found in cache.")
-            return json.loads(value)
+            value = json.loads(value)
+            
+            start_date_compare = datetime.fromisoformat(value["start_datetime"])
+            end_date_compare = datetime.fromisoformat(value["end_datetime"])
+            if start_date_compare <= start_date and end_date <= end_date_compare:
+                print(f"{key} found in cache.")
+                return value
     except Exception as e:
         print(f"Failed to get cache: {e}")
         raise

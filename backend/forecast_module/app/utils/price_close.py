@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 
-async def price_close(ticker, frequency, start_date):
+async def price_close(ticker: str, frequency: str, start_datetime: datetime, end_datetime: datetime) -> dict:
 
     """
     :type ticker: string
@@ -23,12 +23,13 @@ async def price_close(ticker, frequency, start_date):
         client = RESTClient(api_key=os.getenv("API_KEY"))
         client.get_ticker_details(ticker)
 
-        end = datetime.now()
+        temp_start_datetime = int(start_datetime.timestamp())
+        temp_end_datetime = int(end_datetime.timestamp())
 
         price_close = []
         time_close = []
 
-        for a in client.list_aggs(ticker=ticker, multiplier=1, timespan=frequency, from_ = start_date, to= end):
+        for a in client.list_aggs(ticker=ticker, multiplier=1, timespan=frequency, from_ = temp_start_datetime, to= temp_end_datetime):
             price_close.append(a.close)
             time_close.append(a.timestamp)
 
@@ -37,9 +38,23 @@ async def price_close(ticker, frequency, start_date):
 
         return {
             "status": "OK",
+            "start_datetime": start_datetime.isoformat(),
+            "end_datetime": end_datetime.isoformat(),
             "price_close": price_close,
             "time_close": time_close
         }
     
     except Exception as e:
         return json.loads(e.args[0])
+
+
+# if __name__ == "__main__":
+#     async def main():
+#         result = await price_close(
+#             "AAPL",
+#             "hour",
+#             "2023-01-01T09:30:00",
+#             "2023-01-02T16:00:00"
+#         )
+#         print(result)
+        #print(json.dumps(result, indent=2))

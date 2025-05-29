@@ -49,7 +49,7 @@ def mapa(series: pd.Series, h: int, max_agg: int = 5):
     }
 
 
-async def mapa_model(ticker, n_steps=1):
+async def mapa_model(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string

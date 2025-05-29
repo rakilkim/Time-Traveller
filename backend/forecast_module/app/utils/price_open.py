@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 
-async def price_open(ticker, frequency, start_date):
+async def price_open(ticker: str, frequency: str, start_datetime: datetime, end_datetime: datetime) -> dict:
 
     """
     :type ticker: string
@@ -23,12 +23,13 @@ async def price_open(ticker, frequency, start_date):
         client = RESTClient(api_key=os.getenv("API_KEY"))
         client.get_ticker_details(ticker)
 
-        end = datetime.now()
+        temp_start_datetime = int(start_datetime.timestamp())
+        temp_end_datetime = int(end_datetime.timestamp())
 
         price_open = []
         time_open = []
 
-        for a in client.list_aggs(ticker=ticker, multiplier=1, timespan=frequency, from_ = start_date, to= end):
+        for a in client.list_aggs(ticker=ticker, multiplier=1, timespan=frequency, from_ = temp_start_datetime, to= temp_end_datetime):
             price_open.append(a.open)
             time_open.append(a.timestamp)
         
@@ -38,8 +39,11 @@ async def price_open(ticker, frequency, start_date):
 
         return {
             "status": "OK",
+            "start_datetime": start_datetime.isoformat(),
+            "end_datetime": end_datetime.isoformat(),
             "price_open": price_open,
             "time_open": time_open
+           
         }
     
     except Exception as e:

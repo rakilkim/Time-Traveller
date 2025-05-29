@@ -12,7 +12,7 @@ import json
 
 load_dotenv()
 
-async def arima_ols(ticker, n_steps=1):
+async def arima_ols(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string

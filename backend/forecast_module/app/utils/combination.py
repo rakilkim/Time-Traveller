@@ -9,7 +9,7 @@ import json
 
 load_dotenv()
 
-async def combination_model(ticker, steps):
+async def combination_model(ticker: str, steps: int = 1) -> dict:
     try:
         client = RESTClient(api_key=os.getenv("API_KEY"))
         client.get_ticker_details(ticker)

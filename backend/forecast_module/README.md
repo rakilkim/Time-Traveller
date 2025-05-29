@@ -19,18 +19,18 @@ python main.py
 ## Accessing the API
 
 ### Price Endpoints
-To read price_open data, use the following endpoint. Note that the start_date must be in YYYY-MM-DD format and the frequency can only be within the set of {hour, day, week, month}.
+To read price_open data, use the following endpoint. Note that the start_date must be in ISO 8601 format (YYYY-MM-DDTHH:MM:SS) and the frequency can only be within the set of {hour, day, week, month}.
 
 **Get Open Prices**
 ```
-/detail/price_open/{ticker}/{frequency}/{start_date}
+/detail/price_open/{ticker}/{frequency}/{start_datetime}/{end_datetime}
 ```
 
 **Get Close Prices**
 Likewise, to read price_close data, use the following endpoint.
 
 ```
-/detail/price_close/{ticker}/{frequency}/{start_date}
+/detail/price_close/{ticker}/{frequency}/{start_datetime}/{end_datetime}
 ```
 
 Parameters:
@@ -39,7 +39,9 @@ Parameters:
 
 - `frequency:` one of `hour`, `day`, `week`, or `month`
 
-- `start_date:` date in `YYYY-MM-DD` format
+- `start_datetime:` date in `YYYY-MM-DDTHH:MM:SS` format (e.g. `2023-01-01T08:30:00`)
+
+- `end_datetime:` date in `YYYY-MM-DDTHH:MM:SS` format (e.g. `2023-01-11T18:00:00`)
 
 ### Forecast Endpoints
 

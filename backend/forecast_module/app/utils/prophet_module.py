@@ -11,7 +11,7 @@ import json
 
 load_dotenv()
 
-async def prophet_model(ticker, n_steps=1):
+async def prophet_model(ticker: str, n_steps: int = 1) -> dict:
 
     """
     :type ticker: string
