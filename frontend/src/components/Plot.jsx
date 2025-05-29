@@ -26,73 +26,41 @@ function useElementSize(initialHeight = 200) {
 export default function Plot({ ticker }) {
     const [wrapRef, { width, height }] = useElementSize(200);
 
-    const fromTs = 1704967200;
-    const stepTs = 15;
-    const numSteps = 50;
-
-    const xVals = Array.from({ length: numSteps }, (v, i) => fromTs + stepTs * i);
-    const yVals = Array.from({ length: numSteps }, (v, i) => Math.random() * 100);
-    const yVals2 = Array.from({ length: numSteps }, (v, i) => Math.random() * 100);
-
     const [time, setTime] = useState([]);
     const [priceClose, setPriceClose] = useState([]);
     useEffect(() => {
         async function loadData() {
             try {
-                const res = await fetch(`http://localhost:8000/detail/price_close/${ticker}/hour/2025-05-25`);
+                const res = await fetch(`http://localhost:8000/detail/price_close/${ticker}/hour/2025-04-10T08:30:00/2025-05-27T08:30:00`);
 
                 if (!res.ok) {
                     throw new Error(`Server error ${res.status}`);
                 }
                 const data = await res.json();
                 console.log(data);
+                // change timestamp format from ISO-8601 date-time to unix-epoch timestamp
+                const unix_epoch_time_close = data.time_close.map(time => Math.floor((new Date(time + "Z").getTime() / 1000)));
 
-                setTime(data.time_close);
-                setPriceClose([data.price_close]);
+                setTime(unix_epoch_time_close);
+                setPriceClose(data.price_close);
             } catch (error) {
                 console.error(error);
             }
         }
         loadData();
-    }, [tickers]);
+    }, [ticker]);
 
-    // turn time into uplot time using tz or ts or whatever
-    const data = useMemo(() => [time, ...priceClose], []);
-    const series = useMemo(() => [
-        {},
-        {
-            show: true,
-
-            spanGaps: false,
-
-            label: tickers[0],
-            value: (self, rawValue) => rawValue == null ? '' : "*" + rawValue.toFixed(2),
-
-            stroke: "red",
-            width: 2,
-        },
-        {
-            show: true,
-
-            spanGaps: false,
-
-            label: tickers[1],
-            value: (self, rawValue) => rawValue == null ? '' : "*" + rawValue.toFixed(2),
-
-            stroke: "blue",
-            width: 2,
-        },], []);
+    const data = [time, priceClose]
 
     const options = useMemo(
         () => ({
+            title: ticker,
             width: width || 400,
             height: Math.round(width * 7 / 16),
             scales: {
                 x: {
-                    time: true,
                 },
                 y: {
-                    range: [0, 100]
                 },
             },
             axes: [
@@ -101,20 +69,35 @@ export default function Plot({ ticker }) {
                 },
 
             ],
-            series: series,
+            series: [
+                {
+                    label: "Date",
+                },
+                {
+                    show: true,
+
+                    spanGaps: false,
+
+                    label: "Price",
+                    value: (self, rawValue) => rawValue == null ? '' : "$" + rawValue.toFixed(2),
+
+                    stroke: "red",
+                    width: 2,
+                },
+            ],
         }),
-        [width, height, tickers]
+        [width, height, ticker]
     );
 
     return (
         // created ref object for the plot to track resizes
-        <div ref={wrapRef} className='w-full'>
-            {tickers.length && <UplotReact
+        <div ref={wrapRef} className='w-full py-3 border-b border-dashed'>
+            <UplotReact
                 data={data}
                 options={options}
                 onCreate={(chart) => { }}
                 onDelete={(chart) => { }}
-            />}
+            />
         </div>
     );
 }
