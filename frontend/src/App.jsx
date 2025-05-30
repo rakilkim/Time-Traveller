@@ -33,6 +33,9 @@ export default function App() {
         </div>
         <main className='h-full z-10 overflow-y-auto border pb-5 rounded-lg ml-5 lg:ml-56'>
           {portfolio.map((ticker, i) => (
+            // for each plot, add options at top right to choose start/end time
+            // or past week, month, year
+            // and steps, but forbid hour steps for more than a year of data
             <Plot key={i} ticker={ticker} />
           ))}
         </main>
