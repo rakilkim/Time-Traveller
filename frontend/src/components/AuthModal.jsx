@@ -19,7 +19,7 @@ export default function LoginModal({ openLogin, openSignup, onClose, onSwap }) {
             onClick={onClose}
         >
             <form className='flex flex-col w-1/3 p-3 gap-10 bg-white rounded-lg'
-                onSubmit={handleSubmit()}
+                onSubmit={handleSubmit}
                 onClick={(e) => e.stopPropagation()}
             >
                 {openLogin ? (

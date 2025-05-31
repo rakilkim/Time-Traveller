@@ -23,13 +23,14 @@ function useElementSize(initialHeight = 200) {
 }
 
 // can cut the graph by dragging the portion you want to see, double click to undo
-export default function Plot({ ticker }) {
-    const [loading, setLoading] = useState(true);
+export default function Plot({ ticker, onRemove }) {
+    const [found, setFound] = useState(false);
+    const [predLoading, setPredLoading] = useState(false);
+    const [plotLoading, setPlotLoading] = useState(true);
     const [wrapRef, { width, height }] = useElementSize(200);
 
     const [time, setTime] = useState([]);
     const [priceClose, setPriceClose] = useState([]);
-    //const [predictions, setPredictions] = useState([]);
     const [plotData, setPlotData] = useState([[], []]);
     const [plotSeries, setPlotSeries] = useState([
         {
@@ -50,7 +51,7 @@ export default function Plot({ ticker }) {
     useEffect(() => {
         async function loadData() {
             try {
-                setLoading(true);
+                setPlotLoading(true);
 
                 const now = new Date();
                 let nowISO = now.toISOString();
@@ -64,16 +65,22 @@ export default function Plot({ ticker }) {
                 }
                 const data = await res.json();
                 console.log(data);
+                if (data.status === "NOT_FOUND") {
+                    setFound(false)
+                    onRemove(ticker);
+                    return;
+                }
                 // change timestamp format from ISO-8601 date-time to unix-epoch timestamp
                 const unix_epoch_time_close = data.time_close.map(time => Math.floor((new Date(time + "Z").getTime() / 1000)));
 
                 setTime(unix_epoch_time_close);
                 setPriceClose(data.price_close);
                 setPlotData([unix_epoch_time_close, data.price_close]);
+                setFound(true);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false);
+                setPlotLoading(false);
             }
         }
         loadData();
@@ -122,7 +129,7 @@ export default function Plot({ ticker }) {
         const steps = Number(formData.get("steps"));
         const method = formData.get("method");
         try {
-            setLoading(true);
+            setPredLoading(true);
 
             const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
             if (!res.ok) {
@@ -153,8 +160,12 @@ export default function Plot({ ticker }) {
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+            setPredLoading(false);
         }
+    }
+
+    if (!plotLoading && !found) {
+        return null;
     }
 
     return (
@@ -166,11 +177,42 @@ export default function Plot({ ticker }) {
                 onCreate={(chart) => { }}
                 onDelete={(chart) => { }}
             />
-            {loading ? (
+            {predLoading ? (
                 <div
                     role="status"
                     aria-live="polite"
                     className="absolute top-1/3 left-1/2 flex items-center justify-center"
+                >
+                    <svg
+                        className="animate-spin h-8 w-8 text-blue-600"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                        />
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                    </svg>
+                    <span className="sr-only">Loading…</span>
+                </div>
+            ) : (
+                <></>
+            )}
+            {plotLoading ? (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="fixed inset-0 flex justify-center items-center bg-black/5"
                 >
                     <svg
                         className="animate-spin h-8 w-8 text-blue-600"
