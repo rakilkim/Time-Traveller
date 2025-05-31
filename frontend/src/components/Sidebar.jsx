@@ -5,7 +5,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
 
   return (
     <aside className={
-        `absolute w-56 max-w-[80vw] bg-gray-200 text-gray-700 p-4 rounded-lg overflow-y-auto transition-transform duration-300 transform ${!isOpen ? '-translate-x-11/12' : ''} opacity-95`
+        `absolute w-56 bg-gray-200 text-gray-700 p-4 rounded-lg overflow-y-auto transition-transform duration-300 transform ${!isOpen ? '-translate-x-11/12' : ''} opacity-95`
       } aria-hidden={!isOpen}>
         
       <h2 className='text-xl'>Your Portfolio</h2>

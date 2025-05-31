@@ -198,7 +198,7 @@ export default function Plot({ ticker }) {
                 <></>
             )}
             <form onSubmit={handleSubmit} className='flex items-center'>
-                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1'>
+                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1 pb-1'>
                     <legend className='ml-2'>Interval</legend>
                     <p>
                         <label>
@@ -225,7 +225,7 @@ export default function Plot({ ticker }) {
                         </label>
                     </p>
                 </fieldset>
-                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1'>
+                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1 pb-1'>
                     <legend className='ml-2'>Method</legend>
                     <p>
                         <label>

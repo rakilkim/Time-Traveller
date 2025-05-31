@@ -1,22 +1,59 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar.jsx";
 import Plot from "./components/Plot.jsx";
+import AuthModal from "./components/AuthModal.jsx";
+
 
 import { useState } from "react";
 
 
 export default function App() {
   const [sideOpen, setSideOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+
   const [portfolio, setPortfolio] = useState(["AAPL", "MSFT"]);
   const addTicker = (t) => setPortfolio((p) => [...new Set([...p, t])]);
   const removeTicker = (t) => setPortfolio((p) => p.filter((x) => x !== t));
 
-
   return (
     <BrowserRouter>
       <div className="flex flex-col h-full z-0">
-        <header className='flex items-center gap-2 p-3 bg-gray-300 text-gray-700' >
+        <header className='flex items-center justify-between gap-2 p-3 bg-gray-300 text-gray-700' >
           <h1 className='text-2xl'>Time Traveller</h1>
+          <button className='cursor-pointer text-xl' onClick={() => setMenuOpen((o) => !o)}>
+            ☰
+          </button>
+          {menuOpen ? (
+            <ul className='absolute z-20 right-8 top-10 bg-gray-200 text-gray-700 p-4 rounded-lg'>
+              <li className='cursor-pointer mb-2'
+                onClick={() => {
+                  setLoginOpen((o) => !o);
+                  setMenuOpen(false);
+                }}
+              >Login</li>
+              <li className='cursor-pointer'
+                onClick={() => {
+                  setSignupOpen((o) => !o);
+                  setMenuOpen(false);
+                }}
+              >Signup</li>
+            </ul>
+          ) : (
+            <></>
+          )}
+          <AuthModal openLogin={loginOpen}
+            openSignup={signupOpen}
+            onClose={() => {
+              setLoginOpen(false);
+              setSignupOpen(false);
+            }}
+            onSwap={() => {
+              setLoginOpen(!loginOpen);
+              setSignupOpen(!signupOpen);
+            }}
+             />
         </header>
         <div className='sticky top-0 w-64 z-20'>
           <button onClick={() => setSideOpen((o) => !o)}
@@ -33,9 +70,6 @@ export default function App() {
         </div>
         <main className='h-full z-10 overflow-y-auto border pb-5 rounded-lg ml-5 lg:ml-56'>
           {portfolio.map((ticker, i) => (
-            // for each plot, add options at top right to choose start/end time
-            // or past week, month, year
-            // and steps, but forbid hour steps for more than a year of data
             <Plot key={i} ticker={ticker} />
           ))}
         </main>
