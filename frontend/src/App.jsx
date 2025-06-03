@@ -3,6 +3,10 @@ import Sidebar from "./components/Sidebar.jsx";
 import Plot from "./components/Plot.jsx";
 import AuthModal from "./components/AuthModal.jsx";
 import { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 
 export default function App() {
@@ -20,8 +24,15 @@ export default function App() {
     localStorage.setItem("sideOpen", JSON.stringify(sideOpen));
   }, [sideOpen]);
 
+  function handleTickerError() {
+    toast.error("Ticker Not Found");
+  }
+
   return (
     <BrowserRouter>
+    <ToastContainer
+    position="bottom-left"
+    />
       <div className="flex flex-col h-full z-0">
         <header className='flex items-center justify-between gap-2 p-3 bg-gray-300 text-gray-700' >
           <h1 className='text-2xl'>Time Traveller</h1>
@@ -56,7 +67,7 @@ export default function App() {
               setLoginOpen(!loginOpen);
               setSignupOpen(!signupOpen);
             }}
-             />
+          />
         </header>
         <div className='sticky top-0 w-64 z-20'>
           <button onClick={() => setSideOpen((o) => !o)}
@@ -73,7 +84,7 @@ export default function App() {
         </div>
         <main className='h-full z-10 overflow-y-auto border pb-5 rounded-lg xs:ml-5 lg:ml-56'>
           {portfolio.map((ticker, i) => (
-            <Plot key={i} ticker={ticker} onRemove={removeTicker} />
+            <Plot key={i} ticker={ticker} onRemove={removeTicker} tickerError={handleTickerError} />
           ))}
         </main>
       </div>

@@ -37,7 +37,7 @@ function useElementSize(initialHeight = 200) {
 }
 
 // can cut the graph by dragging the portion you want to see, double click to undo
-export default function Plot({ ticker, onRemove }) {
+export default function Plot({ ticker, onRemove, tickerError }) {
     const [found, setFound] = useState(false);
     const [predLoading, setPredLoading] = useState(false);
     const [plotLoading, setPlotLoading] = useState(true);
@@ -62,6 +62,7 @@ export default function Plot({ ticker, onRemove }) {
             width: 2,
         },
     ])
+
     useEffect(() => {
         async function loadData() {
             try {
@@ -80,8 +81,9 @@ export default function Plot({ ticker, onRemove }) {
                 const data = await res.json();
                 console.log(data);
                 if (data.status === "NOT_FOUND") {
-                    setFound(false)
+                    setFound(false);
                     onRemove(ticker);
+                    tickerError();
                     return;
                 }
                 // change timestamp format from ISO-8601 date-time to unix-epoch timestamp
@@ -189,7 +191,6 @@ export default function Plot({ ticker, onRemove }) {
         }, [breakpoint]);
         return isDesk;
     }
-
     const isDesktop = useIsDesktop();
 
     if (!plotLoading && !found) {
@@ -198,7 +199,10 @@ export default function Plot({ ticker, onRemove }) {
 
     return (
         // created ref object for the plot to track resizes
-        <div ref={wrapRef} role="img" aria-label="Line chart of a stock price" className='relative w-full py-3 border-b border-dashed'>
+        <div ref={wrapRef}
+            role="img"
+            aria-label="Line chart of a stock price"
+            className='relative w-full py-3 border-b border-dashed'>
             <UplotReact
                 data={plotData}
                 options={options}
@@ -293,7 +297,7 @@ export default function Plot({ ticker, onRemove }) {
                     <select name='interval'
                         className='border rounded-sm ml-1'
                         disabled={isDesktop}
-                        >
+                    >
                         {intervals.map((interval, i) => (
                             <option key={i} value={interval.value}>{interval.label}</option>
                         ))}
@@ -305,7 +309,7 @@ export default function Plot({ ticker, onRemove }) {
                     <select name='method'
                         className='border rounded-sm ml-1'
                         disabled={isDesktop}
-                        >
+                    >
                         {methods.map((method, i) => (
                             <option key={i} value={method.value}>{method.label}</option>
                         ))}
