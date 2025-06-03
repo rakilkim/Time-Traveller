@@ -2,13 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar.jsx";
 import Plot from "./components/Plot.jsx";
 import AuthModal from "./components/AuthModal.jsx";
-
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 export default function App() {
-  const [sideOpen, setSideOpen] = useState(true);
+  const side = localStorage.getItem("sideOpen");
+  const [sideOpen, setSideOpen] = useState(side ? JSON.parse(side) : true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
@@ -16,6 +15,10 @@ export default function App() {
   const [portfolio, setPortfolio] = useState(["AAPL", "MSFT"]);
   const addTicker = (t) => setPortfolio((p) => [...new Set([...p, t])]);
   const removeTicker = (t) => setPortfolio((p) => p.filter((x) => x !== t));
+
+  useEffect(() => {
+    localStorage.setItem("sideOpen", JSON.stringify(sideOpen));
+  }, [sideOpen]);
 
   return (
     <BrowserRouter>
