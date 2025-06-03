@@ -18,7 +18,7 @@ export default function LoginModal({ openLogin, openSignup, onClose, onSwap }) {
         <div className='fixed inset-0 flex justify-center items-center bg-black/20 z-30'
             onClick={onClose}
         >
-            <form className='flex flex-col w-1/3 p-3 gap-10 bg-white rounded-lg'
+            <form className='flex flex-col w-11/12 xs:w-3/4 md:w-1/2 lg:w-5/12 xl:w-1/3 p-3 gap-10 bg-white rounded-lg'
                 onSubmit={handleSubmit}
                 onClick={(e) => e.stopPropagation()}
             >
