@@ -68,7 +68,7 @@ export default function App() {
             isOpen={sideOpen}
           />
         </div>
-        <main className='h-full z-10 overflow-y-auto border pb-5 rounded-lg ml-5 lg:ml-56'>
+        <main className='h-full z-10 overflow-y-auto border pb-5 rounded-lg xs:ml-5 lg:ml-56'>
           {portfolio.map((ticker, i) => (
             <Plot key={i} ticker={ticker} onRemove={removeTicker} />
           ))}

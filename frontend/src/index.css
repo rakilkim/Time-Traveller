@@ -7,6 +7,10 @@ html, body, #root {
   overscroll-behavior: contain;
 }
 
+@theme {
+  --breakpoint-xs: 480px;
+}
+
 /* 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

@@ -3,6 +3,20 @@ import 'uplot/dist/uPlot.min.css';
 import uPlot from 'uplot';
 import { useMemo, useRef, useState, useEffect } from "react";
 
+const intervals = [
+    { label: "Hourly", value: "hour" },
+    { label: "Daily", value: "day" },
+    { label: "Weekly", value: "week" },
+    { label: "Monthly", value: "month" },
+]
+const methods = [
+    { label: "ARIMA", value: "arima" },
+    { label: "ETS", value: "ets" },
+    { label: "Prophet", value: "prophet" },
+    { label: "MAPA", value: "mapa" },
+    { label: "Combination", value: "combination" },
+]
+
 function useElementSize(initialHeight = 200) {
     const ref = useRef(null);
     const [size, setSize] = useState({ width: 0, height: initialHeight });
@@ -164,6 +178,20 @@ export default function Plot({ ticker, onRemove }) {
         }
     }
 
+    // detect small screen sizes to disable unused form elements
+    function useIsDesktop(breakpoint = "(min-width: 480px)") {
+        const [isDesk, setDesk] = useState(() => window.matchMedia(breakpoint).matches);
+        useEffect(() => {
+            const mql = window.matchMedia(breakpoint);
+            const handler = () => setDesk(mql.matches);
+            mql.addEventListener("change", handler);
+            return () => mql.removeEventListener("change", handler);
+        }, [breakpoint]);
+        return isDesk;
+    }
+
+    const isDesktop = useIsDesktop();
+
     if (!plotLoading && !found) {
         return null;
     }
@@ -239,74 +267,58 @@ export default function Plot({ ticker, onRemove }) {
             ) : (
                 <></>
             )}
-            <form onSubmit={handleSubmit} className='flex items-center'>
-                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1 pb-1'>
+            <form onSubmit={handleSubmit} className='flex flex-col xs:justify-center xs:w-fit md:flex-row md:items-center'>
+                <fieldset disabled={!isDesktop} className='hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1'>
                     <legend className='ml-2'>Interval</legend>
-                    <p>
-                        <label>
-                            <input type='radio' name='interval' value='hour' required />
-                            Hourly
+                    {intervals.map((interval, i) => (
+                        <label key={i}>
+                            <input type='radio' name='interval' value={interval.value} required />
+                            {interval.label}
                         </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='interval' value='day' />
-                            Daily
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='interval' value='week' />
-                            Weekly
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='interval' value='month' />
-                            Monthly
-                        </label>
-                    </p>
+                    ))}
                 </fieldset>
-                <fieldset className='flex gap-4 ml-2 border rounded-sm px-1 pb-1'>
+                <fieldset disabled={!isDesktop} className='hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1'>
                     <legend className='ml-2'>Method</legend>
-                    <p>
-                        <label>
-                            <input type='radio' name='method' value='arima' required />
-                            ARIMA
+                    {methods.map((method, i) => (
+                        <label key={i}>
+                            <input type='radio' name='method' value={method.value} required />
+                            {method.label}
                         </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='method' value='ets' />
-                            ETS
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='method' value='prophet' />
-                            Prophet
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='method' value='mapa' />
-                            MAPA
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input type='radio' name='method' value='combination' />
-                            Combination
-                        </label>
-                    </p>
+                    ))}
                 </fieldset>
-                <label className='mx-5'>
+                {/* Below is when the screen is small */}
+                <label
+                    className='flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-2'>
+                    Interval:
+                    <select name='interval'
+                        className='border rounded-sm ml-1'
+                        disabled={isDesktop}
+                        >
+                        {intervals.map((interval, i) => (
+                            <option key={i} value={interval.value}>{interval.label}</option>
+                        ))}
+                    </select>
+                </label>
+                <label
+                    className='flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-1'>
+                    Method:
+                    <select name='method'
+                        className='border rounded-sm ml-1'
+                        disabled={isDesktop}
+                        >
+                        {methods.map((method, i) => (
+                            <option key={i} value={method.value}>{method.label}</option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className='ml-2 lg:ml-4 mb-4 lg:mb-0'>
                     <div># points</div>
-                    <input type='number' name='steps' min='1' step='1' defaultValue={10}
+                    <input type='number' name='steps' min='1' max='20' step='1' defaultValue={10}
                         className='border rounded-md w-14' />
                 </label>
                 <button type='submit'
-                    className='cursor-pointer border rounded-md w-16 h-8'
+                    className='cursor-pointer border rounded-md w-16 h-8 ml-2 lg:ml-4'
                 >Predict</button>
             </form>
         </div>
