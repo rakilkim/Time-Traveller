@@ -198,7 +198,7 @@ export default function Plot({ ticker, onRemove }) {
 
     return (
         // created ref object for the plot to track resizes
-        <div ref={wrapRef} className='relative w-full py-3 border-b border-dashed'>
+        <div ref={wrapRef} role="img" aria-label="Line chart of a stock price" className='relative w-full py-3 border-b border-dashed'>
             <UplotReact
                 data={plotData}
                 options={options}
