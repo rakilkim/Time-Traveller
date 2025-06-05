@@ -30,9 +30,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
-    <ToastContainer
-    position="bottom-left"
-    />
+      <ToastContainer
+        position="bottom-left"
+      />
       <div className="flex flex-col h-full z-0">
         <header className='flex items-center justify-between gap-2 p-3 bg-gray-300 text-gray-700' >
           <h1 className='text-2xl'>Time Traveller</h1>
@@ -40,19 +40,28 @@ export default function App() {
             ☰
           </button>
           {menuOpen ? (
-            <ul className='absolute z-20 right-8 top-10 bg-gray-200 text-gray-700 p-4 rounded-lg'>
-              <li className='cursor-pointer mb-2'
-                onClick={() => {
-                  setLoginOpen((o) => !o);
-                  setMenuOpen(false);
-                }}
-              >Login</li>
-              <li className='cursor-pointer'
-                onClick={() => {
-                  setSignupOpen((o) => !o);
-                  setMenuOpen(false);
-                }}
-              >Signup</li>
+            <ul
+              className='absolute z-30 right-8 top-10 bg-gray-200 text-gray-700 p-4 rounded-lg shadow'
+              role="menu"
+            >
+              <li>
+                <button
+                  className='cursor-pointer mb-2'
+                  onClick={() => {
+                    setLoginOpen((o) => !o);
+                    setMenuOpen(false);
+                  }}
+                >Login</button>
+              </li>
+              <li>
+                <button
+                  className='cursor-pointer'
+                  onClick={() => {
+                    setSignupOpen((o) => !o);
+                    setMenuOpen(false);
+                  }}
+                >Signup</button>
+              </li>
             </ul>
           ) : (
             <></>
