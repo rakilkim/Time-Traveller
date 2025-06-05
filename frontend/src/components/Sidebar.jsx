@@ -7,10 +7,10 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
     <aside className={
         `absolute w-56 bg-gray-200 text-gray-700 p-4 rounded-lg overflow-y-auto 
         transition-transform duration-300 transform 
-        ${!isOpen ? '-translate-x-full xs:-translate-x-11/12' : ''} opacity-95`
+        ${!isOpen ? "-translate-x-full xs:-translate-x-11/12" : ""} opacity-95`
       }>
         
-      <h2 className='text-xl'>Your Portfolio</h2>
+      <h2 className="text-xl">Your Portfolio</h2>
 
       {/* search box */}
       <form
@@ -22,7 +22,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
           }
         }}
       >
-        <label className='sr'>
+        <label className="sr">
           <input
             type="text"
             placeholder="Add ticker…"
@@ -30,7 +30,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
             onChange={(e) => setQuery(e.target.value)}
             autoComplete="off"
             required
-            className='w-fit px-2 py-1 rounded bg-gray-400 placeholder-gray-500'
+            className="w-fit px-2 py-1 rounded bg-gray-400 placeholder-gray-500"
           />
         </label>
       </form>
@@ -41,7 +41,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
             <button 
             onClick={() => onRemove(tkr)} 
             aria-label={`Remove ${tkr}`}
-            className='mr-2 px-1 py-0 cursor-pointer rounded-4xl hover:bg-gray-300'
+            className="mr-2 px-1 py-0 cursor-pointer rounded-4xl hover:bg-gray-300"
             >
               ✕
             </button>

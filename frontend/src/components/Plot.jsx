@@ -1,6 +1,6 @@
 import UplotReact from "uplot-react";
-import 'uplot/dist/uPlot.min.css';
-import uPlot from 'uplot';
+import "uplot/dist/uPlot.min.css";
+import uPlot from "uplot";
 import { useMemo, useRef, useState, useEffect } from "react";
 
 const intervals = [
@@ -56,7 +56,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
             spanGaps: false,
 
             label: "Price",
-            value: (self, rawValue) => rawValue == null ? '' : "$" + rawValue.toFixed(2),
+            value: (self, rawValue) => rawValue == null ? "" : "$" + rawValue.toFixed(2),
 
             stroke: "red",
             width: 2,
@@ -167,7 +167,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     spanGaps: false,
 
                     label: "Predicted",
-                    value: (self, rawValue) => rawValue == null ? '' : "$" + rawValue.toFixed(2),
+                    value: (self, rawValue) => rawValue == null ? "" : "$" + rawValue.toFixed(2),
 
                     stroke: "blue",
                     width: 2,
@@ -202,7 +202,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
         <div ref={wrapRef}
             role="img"
             aria-label="Line chart of a stock price"
-            className='relative w-full py-3 border-b border-dashed'>
+            className="relative w-full py-3 border-b border-dashed">
             <UplotReact
                 data={plotData}
                 options={options}
@@ -271,31 +271,31 @@ export default function Plot({ ticker, onRemove, tickerError }) {
             ) : (
                 <></>
             )}
-            <form onSubmit={handleSubmit} className='flex flex-col xs:justify-center xs:w-fit md:flex-row md:items-center'>
-                <fieldset disabled={!isDesktop} className='hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1'>
-                    <legend className='ml-2'>Interval</legend>
+            <form onSubmit={handleSubmit} className="flex flex-col xs:justify-center xs:w-fit md:flex-row md:items-center">
+                <fieldset disabled={!isDesktop} className="hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1">
+                    <legend className="ml-2">Interval</legend>
                     {intervals.map((interval, i) => (
                         <label key={i}>
-                            <input type='radio' name='interval' value={interval.value} required />
+                            <input type="radio" name="interval" value={interval.value} required />
                             {interval.label}
                         </label>
                     ))}
                 </fieldset>
-                <fieldset disabled={!isDesktop} className='hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1'>
-                    <legend className='ml-2'>Method</legend>
+                <fieldset disabled={!isDesktop} className="hidden xs:flex gap-4 ml-1 lg:ml-4 border rounded-sm px-1 pb-1">
+                    <legend className="ml-2">Method</legend>
                     {methods.map((method, i) => (
                         <label key={i}>
-                            <input type='radio' name='method' value={method.value} required />
+                            <input type="radio" name="method" value={method.value} required />
                             {method.label}
                         </label>
                     ))}
                 </fieldset>
                 {/* Below is when the screen is small */}
                 <label
-                    className='flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-2'>
+                    className="flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-2">
                     Interval:
-                    <select name='interval'
-                        className='border rounded-sm ml-1'
+                    <select name="interval"
+                        className="border rounded-sm ml-1"
                         disabled={isDesktop}
                     >
                         {intervals.map((interval, i) => (
@@ -304,10 +304,10 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     </select>
                 </label>
                 <label
-                    className='flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-1'>
+                    className="flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-1">
                     Method:
-                    <select name='method'
-                        className='border rounded-sm ml-1'
+                    <select name="method"
+                        className="border rounded-sm ml-1"
                         disabled={isDesktop}
                     >
                         {methods.map((method, i) => (
@@ -316,13 +316,13 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     </select>
                 </label>
 
-                <label className='ml-2 lg:ml-4 mb-4 lg:mb-0'>
+                <label className="ml-2 lg:ml-4 mb-4 lg:mb-0">
                     <div># points</div>
-                    <input type='number' name='steps' min='1' max='20' step='1' defaultValue={10}
-                        className='border rounded-md w-14' />
+                    <input type="number" name="steps" min="1" max="20" step="1" defaultValue={10}
+                        className="border rounded-md w-14" />
                 </label>
-                <button type='submit'
-                    className='cursor-pointer border rounded-md w-16 h-8 ml-2 lg:ml-4'
+                <button type="submit"
+                    className="cursor-pointer border rounded-md w-16 h-8 ml-2 lg:ml-4"
                 >Predict</button>
             </form>
         </div>
