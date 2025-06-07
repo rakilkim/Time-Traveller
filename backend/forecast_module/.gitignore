@@ -3,4 +3,5 @@ venv/
 env/
 .venv/
 .myvenv/
+.python-version
 __pycache__/
