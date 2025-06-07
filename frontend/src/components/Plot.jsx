@@ -42,11 +42,14 @@ export default function Plot({ ticker, onRemove, tickerError }) {
     const [predLoading, setPredLoading] = useState(false);
     const [plotLoading, setPlotLoading] = useState(true);
     const [wrapRef, { width, height }] = useElementSize(200);
+    const [currInterval, setCurrInterval] = useState("day");
+    const [currMethod, setCurrMethod] = useState("arima");
 
+    const [historyLength, setHistoryLength] = useState("1M");
     const [time, setTime] = useState([]);
     const [priceClose, setPriceClose] = useState([]);
     const [plotData, setPlotData] = useState([[], []]);
-    const [plotSeries, setPlotSeries] = useState([
+    const initialSeries = [
         {
             label: "Date",
         },
@@ -61,7 +64,9 @@ export default function Plot({ ticker, onRemove, tickerError }) {
             stroke: "red",
             width: 2,
         },
-    ])
+    ];
+    const [plotSeries, setPlotSeries] = useState(initialSeries);
+    const [plotBands, setPlotBands] = useState([]);
 
     useEffect(() => {
         async function loadData() {
@@ -70,11 +75,28 @@ export default function Plot({ ticker, onRemove, tickerError }) {
 
                 const now = new Date();
                 let nowISO = now.toISOString();
-                const monthAgo = new Date(nowISO);
-                monthAgo.setMonth(monthAgo.getMonth() - 1);
-                const monthAgoISO = monthAgo.toISOString().slice(0, -5);
+                const history = new Date(nowISO);
+                switch (historyLength) {
+                    case "1Y":
+                        history.setFullYear(history.getFullYear() - 1);
+                        break;
+                    case "3M":
+                        history.setMonth(history.getMonth() - 3);
+                        break;
+                    case "1M":
+                        history.setMonth(history.getMonth() - 1);
+                        break;
+                    case "1W":
+                        history.setDate(history.getDate() - 7);
+                        break;
+                    case "1D":
+                        history.setDate(history.getDate() - 1);
+                        break;
+                }
+                const historyISO = history.toISOString().slice(0, -5);
                 nowISO = nowISO.slice(0, -5);
-                const res = await fetch(`http://localhost:8000/detail/price_close/${ticker}/day/${monthAgoISO}/${nowISO}`);
+
+                const res = await fetch(`http://localhost:8000/detail/price_close/${ticker}/day/${historyISO}/${nowISO}`);
                 if (!res.ok) {
                     throw new Error(`Server error ${res.status}`);
                 }
@@ -87,11 +109,11 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     return;
                 }
                 // change timestamp format from ISO-8601 date-time to unix-epoch timestamp
-                const unix_epoch_time_close = data.time_close.map(time => Math.floor((new Date(time + "Z").getTime() / 1000)));
-
+                const unix_epoch_time_close = data.time_close.map(time => Math.floor((new Date(time).getTime() / 1000)));
                 setTime(unix_epoch_time_close);
                 setPriceClose(data.price_close);
                 setPlotData([unix_epoch_time_close, data.price_close]);
+                setPlotSeries(initialSeries);
                 setFound(true);
             } catch (error) {
                 console.error(error);
@@ -100,23 +122,12 @@ export default function Plot({ ticker, onRemove, tickerError }) {
             }
         }
         loadData();
-    }, [ticker]);
+    }, [ticker, historyLength]);
 
-    const initialSeries = [
-        {},
-        {
-            label: ticker,
-            stroke: "red",
-            width: 2,
-            spanGaps: false,
-            value: (_, v) => v == null ? "" : "$" + v.toFixed(2),
-        },
-    ];
     const initialData = [time, priceClose];
 
     const options = useMemo(
         () => ({
-            title: ticker,
             width: width || 400,
             height: Math.round(width * 6 / 16),
             scales: {
@@ -132,14 +143,16 @@ export default function Plot({ ticker, onRemove, tickerError }) {
 
             ],
             series: plotSeries,
+            bands: plotBands,
         }),
-        [width, height, ticker, plotSeries]
+        [width, height, ticker, plotSeries, plotBands]
     );
 
     async function handleSubmit(e) {
         e.preventDefault();
         setPlotData(initialData);
         setPlotSeries(initialSeries);
+        setPlotBands([]);
         const formData = new FormData(e.target);
         const interval = formData.get("interval"); // will be used to get the requested interval from the data we get from the api
         const steps = Number(formData.get("steps"));
@@ -153,14 +166,46 @@ export default function Plot({ ticker, onRemove, tickerError }) {
             }
             const pred = await res.json();
             console.log(pred, Object.fromEntries(Object.entries(pred).filter(([key]) => key.includes(interval))));
-            // filter data by requested interval length
-            //setPredictions(Object.fromEntries(Object.entries(pred).filter(([key]) => key.includes(interval))));
+            const predUpperbound = pred[interval + "_upperbound"];
             const predMean = pred[interval + "_mean"];
-            const predTime = pred[interval + "_time"].map(time => Math.floor((new Date(time + "Z").getTime() / 1000)));
-            console.log(predMean, predTime);
-            setPlotData(([oldTime, oldPrice]) => [[...oldTime, ...predTime], [...oldPrice, ...new Array(steps).fill(null)], [...new Array(oldTime.length).fill(null), ...predMean]]);
+            const predLowerbound = pred[interval + "_lowerbound"];
+            const predTime = pred[interval + "_time"].map(time => Math.floor((new Date(time).getTime() / 1000)));
+            setPlotData(([oldTime, oldPrice]) => [[...oldTime, ...predTime],
+            [...oldPrice, ...new Array(steps).fill(null)],
+            [...new Array(oldTime.length).fill(null), ...predLowerbound],
+            [...new Array(oldTime.length).fill(null), ...predUpperbound],
+            [...new Array(oldTime.length).fill(null), ...predMean],
+            ]);
             setPlotSeries(old => [
                 ...old,
+                {
+                    show: true,
+                    points: {
+                        show: false,
+                    },
+
+                    spanGaps: false,
+
+                    label: "Low",
+                    value: (self, rawValue) => rawValue == null ? "" : "$" + rawValue.toFixed(2),
+
+                    stroke: "green",
+                    width: 1,
+                },
+                {
+                    show: true,
+                    points: {
+                        show: false,
+                    },
+
+                    spanGaps: false,
+
+                    label: "High",
+                    value: (self, rawValue) => rawValue == null ? "" : "$" + rawValue.toFixed(2),
+
+                    stroke: "orange",
+                    width: 1,
+                },
                 {
                     show: true,
 
@@ -171,8 +216,18 @@ export default function Plot({ ticker, onRemove, tickerError }) {
 
                     stroke: "blue",
                     width: 2,
-                }
-            ])
+                },
+            ]);
+            setPlotBands([
+                {
+                    series: [3, 4], // show band top to bottom (serie 3 to serie 4)
+                    fill: "rgba(255,100,0,0.2)",
+                },
+                {
+                    series: [4, 2],
+                    fill: "rgba(0,255,0,0.2)",
+                },
+            ]);
         } catch (error) {
             console.error(error);
         } finally {
@@ -198,11 +253,25 @@ export default function Plot({ ticker, onRemove, tickerError }) {
     }
 
     return (
-        // created ref object for the plot to track resizes
+        // create ref object for the plot to track resizes
         <div ref={wrapRef}
             role="img"
             aria-label="Line chart of a stock price"
             className="relative w-full py-3 border-b border-dashed">
+            <div className="flex justify-between">
+                <h2 className="text-lg lg:text-2xl font-bold ml-1 xs:ml-3">{ticker}</h2>
+                <div className="flex gap-1 mr-1 xs:mr-3">
+                    {["1Y", "3M", "1M", "1W"].map((length, i) => (
+                        <button
+                            key={i}
+                            className={`cursor-pointer border rounded-md w-8
+                            ${length === historyLength ? "bg-gray-300" : ""}
+                            `}
+                            onClick={() => setHistoryLength(length)}
+                        >{length}</button>
+                    ))}
+                </div>
+            </div>
             <UplotReact
                 data={plotData}
                 options={options}
@@ -213,7 +282,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                 <div
                     role="status"
                     aria-live="polite"
-                    className="absolute top-1/3 left-1/2 flex items-center justify-center"
+                    className="absolute top-1/4 md:top-1/3 left-1/2 flex items-center justify-center"
                 >
                     <svg
                         className="animate-spin h-8 w-8 text-blue-600"
@@ -276,7 +345,13 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     <legend className="ml-2">Interval</legend>
                     {intervals.map((interval, i) => (
                         <label key={i}>
-                            <input type="radio" name="interval" value={interval.value} required />
+                            <input
+                                type="radio"
+                                name="interval"
+                                value={interval.value}
+                                checked={currInterval === interval.value}
+                                onChange={(e) => setCurrInterval(e.target.value)}
+                                required />
                             {interval.label}
                         </label>
                     ))}
@@ -285,7 +360,13 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     <legend className="ml-2">Method</legend>
                     {methods.map((method, i) => (
                         <label key={i}>
-                            <input type="radio" name="method" value={method.value} required />
+                            <input
+                                type="radio"
+                                name="method"
+                                value={method.value}
+                                checked={currMethod === method.value}
+                                onChange={(e) => setCurrMethod(e.target.value)}
+                                required />
                             {method.label}
                         </label>
                     ))}
@@ -294,8 +375,10 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                 <label
                     className="flex w-fit xs:hidden ml-2 lg:ml-4 border rounded-sm p-1 mb-2">
                     Interval:
-                    <select name="interval"
+                    <select
+                        name="interval"
                         className="border rounded-sm ml-1"
+                        value={currInterval}
                         disabled={isDesktop}
                     >
                         {intervals.map((interval, i) => (
@@ -308,6 +391,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     Method:
                     <select name="method"
                         className="border rounded-sm ml-1"
+                        value={currMethod}
                         disabled={isDesktop}
                     >
                         {methods.map((method, i) => (
