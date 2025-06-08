@@ -379,6 +379,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                         name="interval"
                         className="border rounded-sm ml-1"
                         value={currInterval}
+                        onChange={(e) => setCurrInterval(e.target.value)}
                         disabled={isDesktop}
                     >
                         {intervals.map((interval, i) => (
@@ -392,6 +393,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     <select name="method"
                         className="border rounded-sm ml-1"
                         value={currMethod}
+                        onChange={(e) => setCurrMethod(e.target.value)}
                         disabled={isDesktop}
                     >
                         {methods.map((method, i) => (

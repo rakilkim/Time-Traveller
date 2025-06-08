@@ -30,7 +30,7 @@ export default function Sidebar({ portfolio, onAdd, onRemove, isOpen }) {
             onChange={(e) => setQuery(e.target.value)}
             autoComplete="off"
             required
-            className="w-fit px-2 py-1 rounded bg-gray-400 placeholder-gray-500"
+            className="w-fit px-2 py-1 rounded bg-gray-400 placeholder-gray-700"
           />
         </label>
       </form>
