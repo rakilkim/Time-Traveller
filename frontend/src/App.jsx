@@ -1,4 +1,3 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar.jsx";
 import Plot from "./components/Plot.jsx";
 import AuthModal from "./components/AuthModal.jsx";
@@ -29,19 +28,19 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
+    <>
       <ToastContainer
         position="bottom-left"
       />
       <div className="flex flex-col h-full z-0">
-        <header className="flex items-center justify-between gap-2 p-3 bg-gray-300 text-gray-700" >
+        <header className="flex items-center justify-between gap-2 p-3 bg-gray-300 text-gray-700 z-30" >
           <h1 className="text-2xl">Time Traveller</h1>
-          <button className="cursor-pointer text-xl" onClick={() => setMenuOpen((o) => !o)}>
+          <button className="cursor-pointer text-xl z-10" onClick={() => setMenuOpen((o) => !o)}>
             ☰
           </button>
           {menuOpen ? (
             <ul
-              className="absolute z-30 right-8 top-10 bg-gray-200 text-gray-700 p-4 rounded-lg shadow"
+              className="absolute right-8 top-10 bg-gray-200 text-gray-700 p-4 rounded-lg shadow"
               role="menu"
             >
               <li>
@@ -97,6 +96,6 @@ export default function App() {
           ))}
         </main>
       </div>
-    </BrowserRouter>
+    </>
   );
 }

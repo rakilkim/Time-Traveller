@@ -39,7 +39,6 @@ function useElementSize(initialHeight = 200) {
 // can cut the graph by dragging the portion you want to see, double click to undo
 export default function Plot({ ticker, onRemove, tickerError }) {
     const [found, setFound] = useState(false);
-    const [predLoading, setPredLoading] = useState(false);
     const [plotLoading, setPlotLoading] = useState(true);
     const [wrapRef, { width, height }] = useElementSize(200);
     const [currInterval, setCurrInterval] = useState("day");
@@ -115,10 +114,9 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                 setPlotData([unix_epoch_time_close, data.price_close]);
                 setPlotSeries(initialSeries);
                 setFound(true);
+                setPlotLoading(false);
             } catch (error) {
                 console.error(error);
-            } finally {
-                setPlotLoading(false);
             }
         }
         loadData();
@@ -158,7 +156,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
         const steps = Number(formData.get("steps"));
         const method = formData.get("method");
         try {
-            setPredLoading(true);
+            setPlotLoading(true);
 
             const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
             if (!res.ok) {
@@ -228,10 +226,9 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                     fill: "rgba(0,255,0,0.2)",
                 },
             ]);
+            setPlotLoading(false);
         } catch (error) {
             console.error(error);
-        } finally {
-            setPredLoading(false);
         }
     }
 
@@ -278,42 +275,11 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                 onCreate={(chart) => { }}
                 onDelete={(chart) => { }}
             />
-            {predLoading ? (
-                <div
-                    role="status"
-                    aria-live="polite"
-                    className="absolute top-1/4 md:top-1/3 left-1/2 flex items-center justify-center"
-                >
-                    <svg
-                        className="animate-spin h-8 w-8 text-blue-600"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            fill="none"
-                        />
-                        <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
-                    </svg>
-                    <span className="sr-only">Loading…</span>
-                </div>
-            ) : (
-                <></>
-            )}
             {plotLoading ? (
                 <div
                     role="status"
                     aria-live="polite"
-                    className="fixed inset-0 flex justify-center items-center bg-black/5"
+                    className="absolute top-1/4 md:top-1/3 left-1/2 flex flex-col items-center justify-center"
                 >
                     <svg
                         className="animate-spin h-8 w-8 text-blue-600"
@@ -335,7 +301,7 @@ export default function Plot({ ticker, onRemove, tickerError }) {
                             d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                         />
                     </svg>
-                    <span className="sr-only">Loading…</span>
+                    <small className="absolute w-40 top-10">Attempting to fetch data…</small>
                 </div>
             ) : (
                 <></>
