@@ -2,12 +2,12 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
+COPY forecast_module/requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY frontend_module/ .
 
 EXPOSE 8000
 
-CMD python ./main.py
+CMD python ./app/main.py
