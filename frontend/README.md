@@ -29,4 +29,4 @@ In order to install the associated dependencies for this module, run the followi
 npm install
 ```
 
-To install the associated WebAssembly module, refer refer to the `README.md` located within `src/rust/README.md`
+To install the associated WebAssembly module, refer to the `README.md` located within `src/rust/README.md`
