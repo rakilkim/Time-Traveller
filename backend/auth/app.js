@@ -4,19 +4,35 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoSanitize = require('express-mongo-sanitize');
+const cors = require('cors');
+
 
 // Creating an Express application instance
 const app = express();
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Middleware to sanitize inputs to prevent injection attacks
+//app.use(mongoSanitize());
+
+
 const PORT = 3000;
 
 // Connect to MongoDB database
 mongoose.connect('mongodb+srv://dbuser:changeme@time-machine.12gus0l.mongodb.net/?retryWrites=true&w=majority&appName=time-machine')
-.then(() => {
-  console.log('Connected to MongoDB');
-})
-.catch((error) => {
-  console.error('Error connecting to MongoDB:', error);
-});
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
 
 // Define a schema for the User collection
 const userSchema = new mongoose.Schema({
@@ -29,18 +45,19 @@ const userSchema = new mongoose.Schema({
 // Create a User model based on the schema
 const User = mongoose.model('User', userSchema);
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-// Middleware to sanitize inputs to prevent injection attacks
-app.use(mongoSanitize);
-
 // Middleware for JWT validation
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) {
+  const header = req.headers['authorization'];
+  if (!header) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  const parts = header.split(' ');
+  if (parts.length !== 2 || !/^Bearer$/i.test(parts[0])) {
+    console.log('verifyToken: malformed Authorization header:', authHeader);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const token = parts[1];
 
   jwt.verify(token, 'secret', (err, decoded) => {
     if (err) {
@@ -50,6 +67,9 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+
+
 
 // Route to register a new user
 app.post('/api/register', async (req, res) => {
@@ -68,9 +88,9 @@ app.post('/api/register', async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
-      tickers: []
+      tickers: ["AAPL", "MSFT"]
     });
-    
+
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -86,7 +106,6 @@ app.post('/api/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-
     // Compare passwords
     const passwordMatch = await bcrypt.compare(req.body.password, user.password);
     if (!passwordMatch) {
@@ -116,7 +135,7 @@ app.get('/api/user', verifyToken, async (req, res) => {
 });
 
 // Protected route to add ticker from user schema
-app.get('/api/addticker', verifyToken, async (req, res) => {
+app.post('/api/addticker', verifyToken, async (req, res) => {
   try {
     // Check if the user exists
     const existingUser = await User.findOne({ email: req.body.email });
@@ -125,7 +144,7 @@ app.get('/api/addticker', verifyToken, async (req, res) => {
     }
 
     // Add ticker if it doesn't already exist in the list of tickers
-    if(existingUser.tickers.indexOf(req.body.ticker) === -1) {
+    if (existingUser.tickers.indexOf(req.body.ticker) === -1) {
       existingUser.tickers.push(req.body.ticker);
     }
 
@@ -138,24 +157,29 @@ app.get('/api/addticker', verifyToken, async (req, res) => {
 });
 
 // Protected route to remove ticker from user schema
-app.get('/api/removeticker', verifyToken, async (req, res) => {
+app.delete('/api/removeticker', verifyToken, async (req, res) => {
   try {
     // Check if the user exists
-    const existingUser = await User.findOne({ email: req.body.email });
+    const email = req.user.email;
+    const ticker = req.body.ticker;
+
+    const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(400).json({ error: 'Email does not exist' });
     }
 
     // Remove ticker if it exists in tickers list
-    index = existingUser.tickers.indexOf(req.body.ticker);
-    if(index === -1) {
-      existingUser.tickers.push(req.body.ticker);
+    const index = existingUser.tickers.indexOf(ticker);
+    if (index === -1) {
+      return res.status(400).json({ error: 'Ticker not in your list' });
     }
+    existingUser.tickers.splice(index, 1);
 
     // Update document with new info
     await existingUser.save();
     res.status(201).json({ message: 'Ticker removed successfully' });
   } catch (error) {
+    console.log(err)
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -164,6 +188,8 @@ app.get('/api/removeticker', verifyToken, async (req, res) => {
 app.get('/', (req, res) => {
   res.send('Welcome to the Time Machine User Authentication API!');
 });
+
+
 
 // Start the server
 app.listen(PORT, () => {
