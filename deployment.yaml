@@ -37,5 +37,7 @@ spec:
   ports:
     - port: 80
       targetPort: 5173
+      name: http
     - port: 443
       targetPort: 5173
+      name: https
