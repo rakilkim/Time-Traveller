@@ -20,3 +20,13 @@ At the root of the frontend folder, run
 ```
 npm run dev
 ```
+
+## Installing Dependencies
+
+In order to install the associated dependencies for this module, run the following:
+
+```
+npm install
+```
+
+To install the associated WebAssembly module, refer refer to the `README.md` located within `src/rust/README.md`
