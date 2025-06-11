@@ -47,7 +47,8 @@ export default function LoginModal({ openLogin, openSignup, onClose, onSwap, onT
     }
 
     return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/20 z-30"
+        <div
+            className="fixed inset-0 flex justify-center items-center bg-black/20 z-30"
             onClick={() => {
                 onClose();
                 setEmail("");
@@ -55,89 +56,114 @@ export default function LoginModal({ openLogin, openSignup, onClose, onSwap, onT
                 setConfirmPassword("");
                 setUsername("");
             }}
-        >
-            <form className="flex flex-col py-5 w-11/12 xs:w-3/4 md:w-1/2 lg:w-5/12 xl:w-1/3 p-3 gap-4 bg-white rounded-lg"
+            aria-label="Authentication modal background"
+            >
+            <form
+                className="flex flex-col py-5 w-11/12 xs:w-3/4 md:w-1/2 lg:w-5/12 xl:w-1/3 p-3 gap-4 bg-white rounded-lg"
                 onSubmit={handleSubmit}
                 onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="auth-heading"
             >
                 {openLogin ? (
-                    <h2 className="text-xl text-center">Login</h2>
-
+                <h2 id="auth-heading" className="text-xl text-center">Login</h2>
                 ) : (
-                    <h2 className="text-xl text-center">Signup</h2>
-
+                <h2 id="auth-heading" className="text-xl text-center">Signup</h2>
                 )}
+
                 <label className='flex flex-col'>
-                    Email:
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="border ml-1 border-gray-400 rounded-md"
-                    />
+                Email:
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="border ml-1 border-gray-400 rounded-md"
+                    aria-label="Email address"
+                />
                 </label>
+
                 <label className='flex flex-col'>
-                    Password:
+                Password:
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="border ml-1 border-gray-400 rounded-md"
+                    aria-label="Password"
+                />
+                </label>
+
+                {openSignup ? (
+                <>
+                    <label className='flex flex-col'>
+                    Confirm Password:
                     <input
                         type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         className="border ml-1 border-gray-400 rounded-md"
+                        aria-label="Confirm password"
                     />
-                </label>
-                {openSignup ? (
-                    <>
-                        <label className='flex flex-col'>
-                            Confirm Password:
-                            <input
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                                className="border ml-1 border-gray-400 rounded-md"
-                            />
-                        </label>
-                        <label className='flex flex-col'>
-                            Username:
-                            <input
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                className="border ml-1 border-gray-400 rounded-md"
-                            />
-                        </label>
-                        <small>Already have an account?
-                            <button
-                                onClick={onSwap}
-                                className="ml-1 font-bold cursor-pointer"
-                            >Log in
-                            </button>
-                        </small>
-                    </>
-                ) : (
-                    <small>Don't have an account?
-                        <button
-                            type="button"
-                            onClick={onSwap}
-                            className="ml-1 font-bold cursor-pointer"
-                        >Sign up
-                        </button>
+                    </label>
+
+                    <label className='flex flex-col'>
+                    Username:
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        className="border ml-1 border-gray-400 rounded-md"
+                        aria-label="Username"
+                    />
+                    </label>
+
+                    <small>
+                    Already have an account?
+                    <button
+                        onClick={onSwap}
+                        className="ml-1 font-bold cursor-pointer"
+                        aria-label="Switch to login"
+                    >
+                        Log in
+                    </button>
                     </small>
+                </>
+                ) : (
+                <small>
+                    Don't have an account?
+                    <button
+                    type="button"
+                    onClick={onSwap}
+                    className="ml-1 font-bold cursor-pointer"
+                    aria-label="Switch to signup"
+                    >
+                    Sign up
+                    </button>
+                </small>
                 )}
-                <button type="submit" className="border font-bold rounded-md cursor-pointer my-5">
-                    Continue
+
+                <button
+                type="submit"
+                className="border font-bold rounded-md cursor-pointer my-5"
+                aria-label="Submit login or signup form"
+                >
+                Continue
                 </button>
             </form>
+
             {loading ? (
-                <div className="fixed left-[48%] top-5">
-                    <Spinner message={"Authenticating..."} />
+                <div className="fixed left-[48%] top-5" aria-label="Loading spinner">
+                <Spinner message={"Authenticating..."} />
                 </div>
             ) : (
                 <></>
             )}
-        </div>
+            </div>
+
     )
 }
