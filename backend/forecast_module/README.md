@@ -78,3 +78,11 @@ Parameters:
 - `ticker:` stock ticker symbol (e.g., `AAPL`)
 
 - `steps:` number of future time steps to forecast
+
+## Manual Tests
+
+In order to run the manual tests to check if the endpoints are working properly, run the following:
+
+```
+python tests/tests.py
+```
