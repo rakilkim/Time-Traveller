@@ -25,3 +25,5 @@ dist-ssr
 
 frontend/node_modules/
 backend/auth/node_modules/
+
+*.env

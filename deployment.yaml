@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tm-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: time-machine
+  template:
+    metadata:
+      labels:
+        app: time-machine
+    spec:
+      containers:
+      - name: auth
+        image: gcr.io/cs144-25s-team34/tm-auth:latest
+        ports:
+        - containerPort: 3000
+      - name: forecast
+        image: gcr.io/cs144-25s-team34/tm-forecast:latest
+        ports:
+        - containerPort: 5173
+      - name: frontend
+        image: gcr.io/cs144-25s-team34/tm-frontend:latest
+        ports:
+        - containerPort: 8000
