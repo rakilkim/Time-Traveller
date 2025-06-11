@@ -9,6 +9,8 @@ pip install -r requirements.txt
 
 This will install all of the necessary packages and requirements for the API server.
 
+Also, you must download the .env file associated with the forecast module using the link in the Final Project report. Place the .env file within the "forecast_module" directory.
+
 ## Running the Server
 Once installed, run the following in order to run the instance:
 

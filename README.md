@@ -13,16 +13,16 @@ This project consists of three core modules:
 ### 1. Authentication Module
 The Authentication Module handles user registration, login, session management, and secure access control.
 
-- **Technologies:** JWT (JSON Web Tokens), cookies/localStorage, bcrypt
+- **Technologies:** Express.js, MongoDB, JWT (JSON Web Tokens)
 - **Features:**
   - User sign-up and login with hashed passwords
   - Token-based session validation
-  - Role-based access control for protected resources
+  - Retrieve and Post User Data to MongoDB
 
 ### 2. Forecasting Module
 The Forecasting Module handles the creation of forecasts.
 
-- **Technologies:** Python, FastAPI, NumPy, pandas, statsmodels, and Prophet
+- **Technologies:** Python, FastAPI, Redis, statsmodels, and Prophet
 - **Features:**
   - Supports forecasting methods such as ARIMA, ETS, Prophet, MAPA
   - Combines historical data preprocessing with model selection
@@ -44,8 +44,9 @@ The Frontend Module provides an interactive user interface for managing time ser
 
 To get started with **TimeTraveller**, refer to the `README.md` files located within each of the main modules:
 
-- [`authentication/README.md`](authentication/README.md) – Setup instructions for the **Authentication Module**
-- [`forecasting/README.md`](forecasting/README.md) – Setup and API usage for the **Forecasting Module**
+- [`auth/README.md`](auth/README.md) – Setup instructions for the **Authentication Module**
+- [`forecast_module/README.md`](forecast_module/README.md) – Setup and API usage for the **Forecasting Module**
 - [`frontend/README.md`](frontend/README.md) – Development and deployment instructions for the **Frontend Module**
+- [`frontend/src/rust/README.md`](frontend/src/rust/README.md) - Setup instructions for **Web Assembly Module**
 
 Each module is independently deployable and designed to work together as part of the full-stack application.
