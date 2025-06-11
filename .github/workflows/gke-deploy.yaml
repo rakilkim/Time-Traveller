@@ -21,7 +21,7 @@ jobs:
           - image: tm-auth
             path: auth/
           - image: tm-forecast
-            path: forecast+module/
+            path: forecast_module/
           - image: tm-frontend
             path: frontend/
 
