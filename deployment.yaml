@@ -33,7 +33,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: time-machine-service
+    app: time-machine
   ports:
     - port: 80
       targetPort: 5173
