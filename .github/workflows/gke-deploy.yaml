@@ -12,8 +12,8 @@ env:
   IMAGE_TAG: latest # image tag
 
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+  setup-build-publish:
+    name: Setup, Build, Publish
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -60,8 +60,13 @@ jobs:
     - name: Publish
       run: |-
         docker push "gcr.io/$PROJECT_ID/${{ matrix.image }}:$IMAGE_TAG"
-
+        
+  gke_deploy:
     # Deploy the Docker image to the GKE cluster
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Deploy
       run: |-
         kubectl apply -f deployment.yaml
