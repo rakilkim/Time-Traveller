@@ -1,0 +1,32 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'auth/Dockerfile',
+    '-t', 'gcr.io/$PROJECT_ID/tm-auth:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/tm-auth:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'forecast_module/Dockerfile',
+    '-t', 'gcr.io/$PROJECT_ID/tm-forecast:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/tm-forecast:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'frontend/Dockerfile',
+    '-t', 'gcr.io/$PROJECT_ID/tm-frontend:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
+
+images: ['gcr.io/$PROJECT_ID/tm-auth:latest', 'gcr.io/$PROJECT_ID/tm-forecast:latest', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
