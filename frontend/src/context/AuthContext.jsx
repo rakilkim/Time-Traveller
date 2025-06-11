@@ -1,6 +1,6 @@
 // src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
-import { login as apiLogin, register as apiRegister, getUser, addTicker, removeTicker } from "../api/auth";
+import { login as apiLogin, logout as apiLogout, register as apiRegister, getUser, addTicker, removeTicker } from "../api/auth";
 
 const Auth = createContext(null);
 export const useAuth = () => useContext(Auth);
@@ -21,8 +21,8 @@ export function AuthProvider({ children }) {
         setUser(u);
     };
 
-    const logout = () => {
-        localStorage.removeItem("token");
+    const logout = async () => {
+        await apiLogout();
         setUser(null);
     };
 

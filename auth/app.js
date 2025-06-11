@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoSanitize = require('express-mongo-sanitize');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 
 // Creating an Express application instance
@@ -12,6 +13,7 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
@@ -47,17 +49,19 @@ const User = mongoose.model('User', userSchema);
 
 // Middleware for JWT validation
 const verifyToken = (req, res, next) => {
-  const header = req.headers['authorization'];
-  if (!header) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  // const header = req.headers['authorization'];
+  // if (!header) {
+  //   return res.status(401).json({ error: 'Unauthorized' });
+  // }
 
-  const parts = header.split(' ');
-  if (parts.length !== 2 || !/^Bearer$/i.test(parts[0])) {
-    console.log('verifyToken: malformed Authorization header:', authHeader);
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  const token = parts[1];
+  // const parts = header.split(' ');
+  // if (parts.length !== 2 || !/^Bearer$/i.test(parts[0])) {
+  //   console.log('verifyToken: malformed Authorization header:', authHeader);
+  //   return res.status(401).json({ error: 'Unauthorized' });
+  // }
+  // const token = parts[1];
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   jwt.verify(token, 'secret', (err, decoded) => {
     if (err) {
@@ -114,11 +118,26 @@ app.post('/api/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ email: user.email }, 'secret');
-    res.status(200).json({ token });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+    res.status(200).json({ ok: true });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.post("/api/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+  res.status(204).end();
+});
+
 
 // Protected route to get user details
 app.get('/api/user', verifyToken, async (req, res) => {
