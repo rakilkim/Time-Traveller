@@ -4,6 +4,17 @@ import uPlot from "uplot";
 import { useMemo, useRef, useState, useEffect } from "react";
 import Spinner from "./Spinner.jsx";
 
+// Import the init function and the specific function we need.
+import init, { average_four_arrays } from "../../public/wasm/average_four_arrays.js";
+
+// Initialize WASM once when the module loads.
+// This returns a promise that resolves when WASM is ready.
+const wasmReady = init("/wasm/average_four_arrays_bg.wasm").catch(e => {
+    console.error("[WASM] Rust failed to initialize", e);
+    return null;
+});
+
+
 const intervals = [
     { label: "Hourly", value: "hour" },
     { label: "Daily", value: "day" },
@@ -156,8 +167,49 @@ export default function Plot({ ticker, onRemove, tickerError }) {
         const method = formData.get("method");
         try {
             setPlotLoading(true);
+            
+            //const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
+            
+            
+            //TODO: Handle Combination Here
+            
+            if (method === "combination") {
+                // Wait for the wasm module to be fully initialized.
+                await wasmReady;
 
-            const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
+                const methodsToCombine = ["arima", "ets", "prophet", "mapa"];
+                const allForecasts = await Promise.all(
+                    methodsToCombine.map(m => fetch(`http://localhost:8000/forecast/${m}/${ticker}/${steps}`).then(r => r.json()))
+                );
+
+                // Extract the 'mean', 'upper', and 'lower' arrays for averaging
+                const means = allForecasts.map(f => f[interval + "_mean"]);
+                const uppers = allForecasts.map(f => f[interval + "_upperbound"]); // Adjusted key
+                const lowers = allForecasts.map(f => f[interval + "_lowerbound"]); // Adjusted key
+
+                // Call the simplified Rust function directly.
+                // wasm-bindgen handles the conversion from JS array to Vec<f32>.
+                const predMean = average_four_arrays(means[0], means[1], means[2], means[3]);
+                const predHigh = average_four_arrays(uppers[0], uppers[1], uppers[2], uppers[3]);
+                const predLow = average_four_arrays(lowers[0], lowers[1], lowers[2], lowers[3]);
+
+                const predTime = allForecasts[0][interval + "_time"].map(t => Math.floor(new Date(t).getTime() / 1000));
+
+                pred = {
+                    [interval + "_mean"]: predMean,
+                    [interval + "_upperbound"]: predHigh,
+                    [interval + "_lowerbound"]: predLow,
+                    [interval + "_time"]: predTime,
+                };
+            } else {
+                const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
+                pred = await res.json();
+            }
+
+            //If WebAssembly Exists to average arrays, Use WebAssembly to average arrays
+
+            //Otherwise, Pull from combination forecast endpoint
             if (!res.ok) {
                 throw new Error(`Server error ${res.status}`);
             }
