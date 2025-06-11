@@ -6,7 +6,7 @@ COPY forecast_module/requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY frontend/ .
+COPY forecast_module/ .
 
 EXPOSE 8000
 
