@@ -29,6 +29,18 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
 
+- name: 'gcr.io/cloud-builders/gcloud'
+id: Deploy
+entrypoint: 'bash'
+args:
+  - '-c'
+  - |
+        PROJECT=$$(gcloud config get-value core/project)          
+        gke-gcloud-auth-plugin --version
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+        gcloud container clusters get-credentials "time-machine" --project "cs144-25s-team34"  --zone "us-west1"  
+        kubectl apply -f deployment.yaml
+
 images: ['gcr.io/$PROJECT_ID/tm-auth:latest', 'gcr.io/$PROJECT_ID/tm-forecast:latest', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
 
 options:
