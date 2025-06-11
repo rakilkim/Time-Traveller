@@ -30,3 +30,6 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
 
 images: ['gcr.io/$PROJECT_ID/tm-auth:latest', 'gcr.io/$PROJECT_ID/tm-forecast:latest', 'gcr.io/$PROJECT_ID/tm-frontend:latest']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
