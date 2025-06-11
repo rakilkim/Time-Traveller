@@ -3,23 +3,20 @@ import "uplot/dist/uPlot.min.css";
 import uPlot from "uplot";
 import { useMemo, useRef, useState, useEffect } from "react";
 import Spinner from "./Spinner.jsx";
+import init, { add } from "../../public/wasm/add_two_numbers.js";
 
-// Import the init function and the specific function we need.
-import init, * as rustWasm from "../../public/wasm/average_four_arrays.js";
+//WASM Module Requirement
+(async () => {
+  try {
+    await init();
+    console.log("[WASM] Rust initialized");
 
-// Initialize WASM once when the module loads.
-// This returns a promise that resolves when WASM is ready.
-async function initialize() {
-    try {
-      wasmInstance = await init()
-      console.log("[WASM] Rust initialized");
-      document.getElementById('rustBlurBtn').disabled = false;
-    } catch (e) {
-      console.error("[WASM] Rust failed to initialize", e);
-    }
+    const result = add(1, 1);
+    console.log("[WASM] 1 + 1 =", result);
+  } catch (e) {
+    console.error("[WASM] Rust failed to initialize", e);
   }
-initialize();
-
+})();
 
 const intervals = [
     { label: "Hourly", value: "hour" },
@@ -173,76 +170,8 @@ export default function Plot({ ticker, onRemove, tickerError }) {
         const method = formData.get("method");
         try {
             setPlotLoading(true);
-            
-            //const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
-            
-            
-            //TODO: Handle Combination Here
-            
-            if (method === "combination") {
-                // wait for wasm to be ready
-                if (!wasmInstance) throw new Error("WASM not initialized yet");
-                    const methodsToCombine = ["arima","ets","prophet","mapa"];
-                    const allForecasts = await Promise.all(
-                    methodsToCombine.map(m => fetch(`http://localhost:8000/forecast/${m}/${ticker}/${steps}`).then(r => r.json()))
-                );
 
-                const len = steps;
-                const toF32 = arr => {
-                const f32 = new Float32Array(len);
-                for (let i = 0; i < len; i++) f32[i] = arr[i];
-                return f32;
-                };
-
-                // three groups: mean/upper/lower
-                const groups = ["mean","upper","lower"].map(key => allForecasts.map(f => toF32(f[interval + "_" + key])));
-
-                // allocate + copy
-                const ptrGroups = groups.map(arrs =>
-                arrs.map(f32 => {
-                    // grow memory if needed
-                    // const totalBytes = f32.byteLength + 64;
-                    // while (rustMemory.buffer.byteLength < totalBytes) {
-                    // rustMemory.grow(1);
-                    // }
-                    const ptr = wasmInstance.allocate(f32.length);
-                    new Float32Array(rustMemory.buffer, ptr, f32.length).set(f32);
-                    return ptr;
-                })
-                );
-
-                // average
-                const outPtrs = {
-                mean:  wasmInstance.average_four_arrays(...ptrGroups[0], len),
-                upper: wasmInstance.average_four_arrays(...ptrGroups[1], len),
-                lower: wasmInstance.average_four_arrays(...ptrGroups[2], len),
-                };
-
-                // read back
-                const predMean  = Array.from(new Float32Array(rustMemory.buffer, outPtrs.mean, len));
-                const predHigh  = Array.from(new Float32Array(rustMemory.buffer, outPtrs.upper, len));
-                const predLow   = Array.from(new Float32Array(rustMemory.buffer, outPtrs.lower, len));
-                const predTime  = allForecasts[0][interval + "_time"].map(t => Math.floor(new Date(t).getTime()/1000));
-
-                // deallocate
-                ptrGroups.flat().forEach(ptr => wasmInstance.deallocate(ptr, len));
-                Object.values(outPtrs).forEach(ptr => wasmInstance.deallocate(ptr, len));
-
-                pred = {
-                [interval + "_mean"]:        predMean,
-                [interval + "_upperbound"]:  predHigh,
-                [interval + "_lowerbound"]:  predLow,
-                [interval + "_time"]:        predTime,
-                };
-            } else {
-                const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
-                if (!res.ok) throw new Error(`Server error ${res.status}`);
-                pred = await res.json();
-            }
-
-            //If WebAssembly Exists to average arrays, Use WebAssembly to average arrays
-
-            //Otherwise, Pull from combination forecast endpoint
+            const res = await fetch(`http://localhost:8000/forecast/${method}/${ticker}/${steps}`);
             if (!res.ok) {
                 throw new Error(`Server error ${res.status}`);
             }

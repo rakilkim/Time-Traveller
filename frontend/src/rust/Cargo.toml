@@ -1,29 +1,21 @@
 [package]
-name = "average-four-arrays"
-version = "0.1.0"
+name = "add-two-numbers"
 edition = "2021"
-description = "WASM module to average four Float32Arrays equally"
+description = "WASM module to add two numbers using Rust and wasm-bindgen"
 license = "MIT"
-repository = "https://github.com/your-org/average-four-arrays"
+repository = "https://github.com/your-org/add-two-numbers"
 
 [lib]
 crate-type = ["cdylib"]
 path = "lib.rs"
 
 [dependencies]
-# Updated to the latest version for bug fixes and improvements
 wasm-bindgen = "0.2.92"
 
-# Ensure you are using a version of wasm-pack compatible with this
-# by running `cargo install wasm-pack`
-
 [profile.release]
-# Optimize for size and speed
 opt-level = "s"
 lto = true
 codegen-units = 1
 
 [package.metadata.wasm-pack.profile.release]
-# -O4 is a very aggressive optimization level. Let's stick to the
-# standard and powerful size optimization from wasm-opt.
 wasm-opt = ["-Os"]
