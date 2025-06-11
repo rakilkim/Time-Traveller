@@ -65,7 +65,7 @@ async def prophet_model(ticker: str, n_steps: int = 1) -> dict:
         #step_size for month: 2674800000
         #Series object contains (type, step_size, seasonality, time list, price list)
 
-        series = [('hour', 'H', 24, time_hour, price_hour), ('day', 'D', 7, time_day, price_day), ('week', 'W', 7, time_week, price_week), ('month', 'M', 12, time_month, price_month)]
+        series = [('hour', 'h', 24, time_hour, price_hour), ('day', 'D', 7, time_day, price_day), ('week', 'W', 7, time_week, price_week), ('month', 'ME', 12, time_month, price_month)]
 
         output = {}
         
@@ -75,9 +75,26 @@ async def prophet_model(ticker: str, n_steps: int = 1) -> dict:
                 "y": price
             })
 
-            model = Prophet()
+            if (frequency == 'month'):
+                model = Prophet(yearly_seasonality=False, weekly_seasonality=False, daily_seasonality = True)
+            elif (frequency == 'week'):
+                model = Prophet(yearly_seasonality=False, weekly_seasonality=True, daily_seasonality = True)
+            elif (frequency == 'month'):
+                model = Prophet(yearly_seasonality=False, weekly_seasonality=True, daily_seasonality = True)
+            else:
+                model = Prophet(yearly_seasonality=False, weekly_seasonality=False, daily_seasonality = False)
+
+            # period_days = seasonality/24 if frequency == 'hour' else seasonality
+            # model.add_seasonality(
+            #     name=f"{frequency}_seasonality",
+            #     period=period_days,
+            #     fourier_order=3
+            # )
+
             model.fit(df)
             future = model.make_future_dataframe(periods=n_steps, freq=step_size)
+
+            
             forecast = model.predict(future)
 
             #=========== STORE INFORMATION IN DICTIONARY ===========#
