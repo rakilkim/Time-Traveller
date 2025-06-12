@@ -13,6 +13,10 @@ spec:
         app: time-machine
     spec:
       containers:
+      - name: frontend
+        image: gcr.io/cs144-25s-team34/tm-frontend:latest
+        ports:
+        - containerPort: 5173
       - name: auth
         image: gcr.io/cs144-25s-team34/tm-auth:latest
         ports:
@@ -21,7 +25,3 @@ spec:
         image: gcr.io/cs144-25s-team34/tm-forecast:latest
         ports:
         - containerPort: 8000
-      - name: frontend
-        image: gcr.io/cs144-25s-team34/tm-frontend:latest
-        ports:
-        - containerPort: 5173
