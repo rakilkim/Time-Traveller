@@ -3,10 +3,16 @@ kind: Service
 metadata:
   name: time-machine-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: time-machine
   ports:
     - port: 80
       targetPort: 5173
       name: http
+    - port: 8000
+      targetPort: 8000
+      name: httpforecast
+    - port: 3000
+      targetPort: 3000
+      name: httpauth
