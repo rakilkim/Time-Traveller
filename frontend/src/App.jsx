@@ -1,6 +1,7 @@
 import Sidebar from "./components/Sidebar.jsx";
 import Plot from "./components/Plot.jsx";
 import AuthModal from "./components/AuthModal.jsx";
+import CookieBanner from "./components/CookieBanner.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
@@ -146,6 +147,7 @@ export default function App() {
             <Plot key={i} ticker={ticker} onRemove={removeTicker} tickerError={() => handleToast("error", "Ticker Not Found")} />
           ))}
         </main>
+        <CookieBanner />
       </div>
     </>
   );
