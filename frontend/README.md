@@ -15,7 +15,7 @@
 
 "uplot-react": "^1.2.2"
 
-## Installing the PWA
+## Running Under Development
 At the root of the frontend folder, run
 ```
 npm run dev
@@ -24,13 +24,8 @@ npm run dev
 ## Running Under Production
 To run a preview under production, run
 ```
+npm run build
 npm run preview
-```
-
-## Running Under Development
-At the root of the frontend folder, run
-```
-npm run dev
 ```
 
 ## Installing Dependencies
