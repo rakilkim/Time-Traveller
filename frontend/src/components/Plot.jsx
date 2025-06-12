@@ -3,20 +3,20 @@ import "uplot/dist/uPlot.min.css";
 import uPlot from "uplot";
 import { useMemo, useRef, useState, useEffect } from "react";
 import Spinner from "./Spinner.jsx";
-// import init, { add } from "../../public/wasm/add_two_numbers.js";
+import init, { add } from "../../public/wasm/add_two_numbers.js";
 
-//WASM Module Requirement
-// (async () => {
-//   try {
-//     await init();
-//     console.log("[WASM] Rust initialized");
+// WASM Module Requirement
+(async () => {
+  try {
+    await init();
+    console.log("[WASM] Rust initialized");
 
-//     const result = add(1, 1);
-//     console.log("[WASM] 1 + 1 =", result);
-//   } catch (e) {
-//     console.error("[WASM] Rust failed to initialize", e);
-//   }
-// })();
+    const result = add(1, 1);
+    console.log("[WASM] 1 + 1 =", result);
+  } catch (e) {
+    console.error("[WASM] Rust failed to initialize", e);
+  }
+})();
 
 const intervals = [
     { label: "Hourly", value: "hour" },

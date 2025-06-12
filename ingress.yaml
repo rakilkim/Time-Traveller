@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: time-machine-ingress
+  annotations:
+    # Use a static IP (optional but recommended)
+    kubernetes.io/ingress.global-static-ip-name: "static-ip-name" # Replace with your static IP name
+    # Link your Google-managed certificate
+    networking.gke.io/managed-certificates: "time-machine-certificate"
+    # Automatic HTTP to HTTPS redirect
+    networking.gke.io/v1beta1.FrontendConfig: "default-redirect-config" # We'll create this next
+spec:
+  rules:
+    - host: app.time-machine.cs144.com # Replace with your actual domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: time-machine-service # Your ClusterIP Service name
+                port:
+                  number: 80 # The port your Service listens on
