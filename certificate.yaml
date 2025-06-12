@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: time-machine-certificate
+spec:
+  domains:
+  - app.time-machine.cs144.com # Replace with your actual domain

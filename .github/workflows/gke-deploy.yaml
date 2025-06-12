@@ -83,4 +83,5 @@ jobs:
     - name: Deploy
       run: |-
         kubectl apply -f deployment.yaml
-        kubectl get pods
+        kubectl apply -f service.yaml
+        kubectl apply -f certificate.yaml
