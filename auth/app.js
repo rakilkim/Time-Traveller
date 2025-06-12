@@ -21,9 +21,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Middleware to sanitize inputs to prevent injection attacks
-//app.use(mongoSanitize());
-
 
 const PORT = 3000;
 

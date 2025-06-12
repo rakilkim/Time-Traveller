@@ -34,10 +34,7 @@ export default function LoginModal({ openLogin, openSignup, onClose, onSwap, onT
             onToast("success", "Login Successful");
         } catch (err) {
             setLoading(false);
-            if (err == "Error: 401")
-                onToast("error", String(err));
-            else
-                onToast("error", String(err));
+            onToast("error", String(err));
             console.log(err);
         }
     }
