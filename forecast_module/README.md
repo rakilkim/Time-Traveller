@@ -1,7 +1,7 @@
 # Forecasting API
 
 ## Envrionment Setup
-In order to recreate the environment, first create your own python virtual envrionment. Within this virtual environment, run the following command in the module's root directory:
+In order to recreate the environment, first create your own python virtual envrionment( we recommend v3.12.3). Within this virtual environment, run the following command in the module's root directory:
 
 ```
 pip install -r requirements.txt
@@ -12,7 +12,7 @@ This will install all of the necessary packages and requirements for the API ser
 Also, you must download the .env file associated with the forecast module using the link in the Final Project report. Place the .env file within the "forecast_module" directory.
 
 ## Running the Server
-Once installed, run the following in order to run the instance:
+Once installed, run the following inside the /app folder to run the instance:
 
 ```
 python main.py
