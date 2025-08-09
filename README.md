@@ -1,6 +1,6 @@
 # TimeTraveller (team34)
 
-## By Marc Luzuriaga, Pranav Kesani, Rakil Kim
+## By Rakil Kim, Marc Luzuriaga, Pranav Kesani 
 
 **TimeTraveller** is a web-based application that applies time series forecasting methods to live stock data, enabling users to visualize and predict future price trends across various intervals. The system integrates secure user authentication, advanced forecasting algorithms, and a responsive frontend interface designed for real-time interaction and accessibility.
 
